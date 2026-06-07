@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="100" fill="#E0E5EC"/>
+  <circle cx="256" cy="256" r="180" fill="#8A9A86" opacity="0.1" />
+  <g stroke="#8A9A86" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Stylized 'N' Monogram made of tape measure -->
+    <path d="M 160 380 L 160 140 L 350 380 L 350 140" />
+    <line x1="160" y1="200" x2="190" y2="200" stroke-width="12"/>
+    <line x1="160" y1="260" x2="190" y2="260" stroke-width="12"/>
+    <line x1="160" y1="320" x2="190" y2="320" stroke-width="12"/>
+    <line x1="350" y1="200" x2="320" y2="200" stroke-width="12"/>
+    <line x1="350" y1="260" x2="320" y2="260" stroke-width="12"/>
+    <line x1="350" y1="320" x2="320" y2="320" stroke-width="12"/>
+  </g>
+</svg>
