@@ -24,7 +24,7 @@ self.addEventListener('fetch', event => {
         }
         return fetch(event.request).catch(() => {
           // Fallback for offline if fetch fails
-          return caches.match('/');
+          return caches.match('./');
         });
       })
   );
