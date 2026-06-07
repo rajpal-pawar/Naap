@@ -6,8 +6,8 @@
   "background_color": "#E0E5EC",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "/",
-  "start_url": "/",
+  "scope": "https://rajpal-pawar.github.io/Naap/",
+  "start_url": "https://rajpal-pawar.github.io/Naap/",
   "icons": [
     {
       "src": "icon.svg",

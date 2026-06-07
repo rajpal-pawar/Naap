@@ -1,8 +1,8 @@
-const CACHE_NAME = 'naap-cache-v1';
+const CACHE_NAME = 'naap-cache-v4';
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json',
+  './manifest.json?v=4',
   './icon.svg'
 ];
 
@@ -17,14 +17,21 @@ self.addEventListener('install', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        if (response) {
-          return response;
+        // If network fetch is successful, update cache
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
         }
-        return fetch(event.request).catch(() => {
-          // Fallback for offline if fetch fails
-          return caches.match('/');
+        return response;
+      })
+      .catch(() => {
+        // If offline, fallback to cache
+        return caches.match(event.request).then(cachedResponse => {
+          return cachedResponse || caches.match('./');
         });
       })
   );

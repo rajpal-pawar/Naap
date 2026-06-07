@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Moon, Sun, Plus, BookOpen, User, Phone, ArrowLeft, Save, Shirt, Ruler, Trash2, Edit2, PhoneCall, Copy } from 'lucide-react';
+import { Moon, Sun, Plus, BookOpen, User, Phone, ArrowLeft, Save, Shirt, Ruler, Trash2, Edit2, PhoneCall, Copy, IndianRupee, CheckCircle, Circle, PlusCircle } from 'lucide-react';
 
 const translations = {
   en: {
@@ -41,6 +41,14 @@ const translations = {
     editCustomer: 'Edit',
     copyPhone: 'Copy',
     phoneCopied: 'Copied!',
+    payments: 'Payments',
+    amount: 'Amount',
+    remark: 'Remark (e.g., Kurti Stitching)',
+    paid: 'Paid',
+    unpaid: 'Unpaid',
+    addPayment: 'Add Payment',
+    paymentDate: 'Date',
+    noPayments: 'No payment records yet.',
   },
   hi: {
     appTitle: 'नाप',
@@ -81,6 +89,14 @@ const translations = {
     editCustomer: 'संपादित करें',
     copyPhone: 'कॉपी करें',
     phoneCopied: 'कॉपी हो गया!',
+    payments: 'भुगतान (Payments)',
+    amount: 'राशि (Amount)',
+    remark: 'विवरण (उदा. कुर्ती सिलाई)',
+    paid: 'जमा (Paid)',
+    unpaid: 'बाकी (Unpaid)',
+    addPayment: 'भुगतान जोड़ें',
+    paymentDate: 'तारीख',
+    noPayments: 'अभी तक कोई भुगतान रिकॉर्ड नहीं है।',
   }
 };
 
@@ -160,6 +176,7 @@ function App() {
 
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [units, setUnits] = useState({});
+  const [paymentForm, setPaymentForm] = useState({ amount: '', remark: '', paid: false });
   const [formData, setFormData] = useState({
     name: '', phone: '', kurtiLength: '', kurtiChest: '', kurtiWaist: '', kurtiShoulder: '', kurtiSideSlit: '',
     kanchaliTukki: '', kanchaliSleeveLength: '', kanchaliSleeveRound: '', kanchaliKharaki: '', kanchaliBaadh: '',
@@ -266,6 +283,44 @@ function App() {
   const handleViewCustomer = (customer) => {
     setSelectedCustomer(customer);
     window.location.hash = 'view';
+  };
+
+  const handleAddPayment = () => {
+    if (!paymentForm.amount) return;
+    
+    const payment = {
+      id: Date.now().toString(),
+      amount: paymentForm.amount,
+      remark: paymentForm.remark,
+      paid: paymentForm.paid,
+      date: new Date().toLocaleDateString(language === 'en' ? 'en-IN' : 'hi-IN', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      })
+    };
+
+    const updatedCustomer = {
+      ...selectedCustomer,
+      payments: [payment, ...(selectedCustomer.payments || [])]
+    };
+
+    const updatedCustomers = customers.map(c => c.id === updatedCustomer.id ? updatedCustomer : c);
+    setCustomers(updatedCustomers);
+    setSelectedCustomer(updatedCustomer);
+    localStorage.setItem('naap_customers', JSON.stringify(updatedCustomers));
+    setPaymentForm({ amount: '', remark: '', paid: false });
+  };
+
+  const handleTogglePaymentStatus = (paymentId) => {
+    const updatedCustomer = {
+      ...selectedCustomer,
+      payments: selectedCustomer.payments.map(p => 
+        p.id === paymentId ? { ...p, paid: !p.paid } : p
+      )
+    };
+    const updatedCustomers = customers.map(c => c.id === updatedCustomer.id ? updatedCustomer : c);
+    setCustomers(updatedCustomers);
+    setSelectedCustomer(updatedCustomer);
+    localStorage.setItem('naap_customers', JSON.stringify(updatedCustomers));
   };
 
   const handleDeleteCustomer = (id) => {
@@ -547,6 +602,82 @@ function App() {
                 </div>
               </div>
             )}
+
+            <div className="form-section">
+              <div className="section-title">
+                <IndianRupee size={20} /> {t.payments}
+              </div>
+              <div className="neumorphic" style={{ padding: '20px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+                  <div className="neumorphic-inset" style={{ display: 'flex', alignItems: 'center' }}>
+                    <span style={{ paddingLeft: '15px', color: 'var(--text-muted)' }}>₹</span>
+                    <input 
+                      type="number" 
+                      inputMode="decimal"
+                      value={paymentForm.amount}
+                      onChange={(e) => setPaymentForm({...paymentForm, amount: e.target.value})}
+                      placeholder={t.amount}
+                      className="form-input"
+                      style={{ paddingLeft: '8px' }}
+                    />
+                  </div>
+                  <div className="neumorphic-inset">
+                    <input 
+                      type="text" 
+                      value={paymentForm.remark}
+                      onChange={(e) => setPaymentForm({...paymentForm, remark: e.target.value})}
+                      placeholder={t.remark}
+                      className="form-input"
+                    />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '500' }}>
+                      <div onClick={() => setPaymentForm({...paymentForm, paid: !paymentForm.paid})}>
+                        {paymentForm.paid ? <CheckCircle size={24} color="#2ecc71" /> : <Circle size={24} color="var(--text-muted)" />}
+                      </div>
+                      {paymentForm.paid ? t.paid : t.unpaid}
+                    </label>
+                    <button className="neumorphic-btn" onClick={handleAddPayment} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 15px', color: 'var(--accent-color)' }}>
+                      <PlusCircle size={18} /> {t.addPayment}
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ borderTop: '1px solid rgba(138, 154, 134, 0.2)', paddingTop: '15px' }}>
+                  {(!selectedCustomer.payments || selectedCustomer.payments.length === 0) ? (
+                    <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center' }}>{t.noPayments}</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {selectedCustomer.payments.map(payment => (
+                        <div key={payment.id} className="neumorphic" style={{ padding: '12px 15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <div style={{ fontWeight: 'bold', fontSize: '16px' }}>₹{payment.amount}</div>
+                            {payment.remark && <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{payment.remark}</div>}
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{payment.date}</div>
+                          </div>
+                          <button 
+                            className="neumorphic-btn" 
+                            onClick={() => handleTogglePaymentStatus(payment.id)}
+                            style={{ 
+                              padding: '8px 12px', 
+                              backgroundColor: payment.paid ? 'rgba(46, 204, 113, 0.1)' : 'transparent',
+                              color: payment.paid ? '#2ecc71' : 'var(--text-muted)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              border: payment.paid ? '1px solid #2ecc71' : 'none'
+                            }}
+                          >
+                            {payment.paid ? <CheckCircle size={16} /> : <Circle size={16} />}
+                            {payment.paid ? t.paid : t.unpaid}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
             <div className="form-actions" style={{ marginTop: '30px', marginBottom: '40px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <button 
