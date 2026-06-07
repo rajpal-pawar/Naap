@@ -1,12 +1,13 @@
-const CACHE_NAME = 'naap-cache-v4';
+const CACHE_NAME = 'naap-cache-v5';
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json?v=4',
+  './manifest.json?v=5',
   './icon.svg'
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -38,16 +39,15 @@ self.addEventListener('fetch', event => {
 });
 
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
