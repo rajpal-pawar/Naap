@@ -143,6 +143,21 @@ function App() {
   const [language, setLanguage] = useState('en');
   const [currentView, setCurrentView] = useState('home'); // 'home', 'add', or 'view'
   const [customers, setCustomers] = useState([]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'add' || hash === 'view' || hash === 'home') {
+        setCurrentView(hash);
+      } else {
+        setCurrentView('home');
+      }
+    };
+    handleHashChange();
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [units, setUnits] = useState({});
   const [formData, setFormData] = useState({
@@ -229,7 +244,7 @@ function App() {
       lehengaLength: '', lehengaWaist: '', lehengaMagji: '', notes: ''
     });
     setUnits({});
-    setCurrentView('home');
+    window.location.hash = 'home';
   };
 
   const handleAddClick = () => {
@@ -239,18 +254,18 @@ function App() {
       lehengaLength: '', lehengaWaist: '', lehengaMagji: '', notes: ''
     });
     setUnits({});
-    setCurrentView('add');
+    window.location.hash = 'add';
   };
 
   const handleEditCustomer = () => {
     setFormData({ ...selectedCustomer });
     setUnits(selectedCustomer.units || {});
-    setCurrentView('add');
+    window.location.hash = 'add';
   };
 
   const handleViewCustomer = (customer) => {
     setSelectedCustomer(customer);
-    setCurrentView('view');
+    window.location.hash = 'view';
   };
 
   const handleDeleteCustomer = (id) => {
@@ -258,7 +273,7 @@ function App() {
       const updatedCustomers = customers.filter(c => c.id !== id);
       setCustomers(updatedCustomers);
       localStorage.setItem('naap_customers', JSON.stringify(updatedCustomers));
-      setCurrentView('home');
+      window.location.hash = 'home';
       setSelectedCustomer(null);
     }
   };
@@ -434,7 +449,7 @@ function App() {
             <div className="form-actions">
               <button 
                 className="neumorphic-btn btn-secondary" 
-                onClick={() => setCurrentView('home')}
+                onClick={() => { window.location.hash = 'home'; }}
               >
                 <ArrowLeft size={20} />
               </button>
@@ -544,7 +559,7 @@ function App() {
               <div style={{ display: 'flex', gap: '15px' }}>
                 <button 
                   className="neumorphic-btn" 
-                  onClick={() => setCurrentView('home')}
+                  onClick={() => { window.location.hash = 'home'; }}
                   style={{ flex: 1, padding: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 >
                   <ArrowLeft size={20} style={{ marginRight: '8px' }}/> {t.backToList}
