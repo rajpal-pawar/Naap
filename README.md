@@ -20,11 +20,11 @@ Naap is a mobile-first, fully offline-capable Progressive Web App (PWA) designed
 
 ## 📸 Snapshots
 
-> **Note:** Add your app screenshots here! Create a `snapshots` folder in the root directory and replace the placeholders below.
+> **Note:** Replace these placeholder images by creating a `snapshots` folder in the root directory and updating the links below.
 
 | Home Screen | Measurement Form | Dark Mode |
 | :---: | :---: | :---: |
-| <img src="snapshots/home.png" width="250" alt="Home Screen"> | <img src="snapshots/form.png" width="250" alt="Measurement Form"> | <img src="snapshots/dark.png" width="250" alt="Dark Mode"> |
+| <img src="https://via.placeholder.com/250x500.png?text=Home+Screen" width="250" alt="Home Screen"> | <img src="https://via.placeholder.com/250x500.png?text=Measurement+Form" width="250" alt="Measurement Form"> | <img src="https://via.placeholder.com/250x500.png?text=Dark+Mode" width="250" alt="Dark Mode"> |
 
 ## 🛠️ Technology Stack
 
