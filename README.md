@@ -1,6 +1,6 @@
 # Naap (नाप) - Tailor's Digital Ledger 🪡
 
-![Naap Banner](./public/icon.svg)
+
 
 Naap is a mobile-first, fully offline-capable Progressive Web App (PWA) designed specifically for tailors to record and manage measurements for traditional **Rajputi Poshaks** (Kurti, Kanchali, and Lehenga).
 
