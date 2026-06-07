@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Moon, Sun, Plus, BookOpen, User, Phone, ArrowLeft, Save, Shirt, Ruler } from 'lucide-react';
+import { Moon, Sun, Plus, BookOpen, User, Phone, ArrowLeft, Save, Shirt, Ruler, Trash2, Edit2, PhoneCall, Copy } from 'lucide-react';
 
 const translations = {
   en: {
@@ -36,6 +36,11 @@ const translations = {
     namePlaceholder: 'e.g., Anita Rajput',
     phonePlaceholder: 'e.g., 9876543210',
     notesPlaceholder: 'Any specific design requests...',
+    deleteCustomer: 'Delete',
+    deleteConfirm: 'Are you sure you want to delete this customer?',
+    editCustomer: 'Edit',
+    copyPhone: 'Copy',
+    phoneCopied: 'Copied!',
   },
   hi: {
     appTitle: 'नाप',
@@ -71,6 +76,11 @@ const translations = {
     namePlaceholder: 'उदा. अनीता राजपूत',
     phonePlaceholder: 'उदा. 9876543210',
     notesPlaceholder: 'कोई विशेष डिज़ाइन अनुरोध...',
+    deleteCustomer: 'हटाएं',
+    deleteConfirm: 'क्या आप वाकई इस ग्राहक को हटाना चाहते हैं?',
+    editCustomer: 'संपादित करें',
+    copyPhone: 'कॉपी करें',
+    phoneCopied: 'कॉपी हो गया!',
   }
 };
 
@@ -187,18 +197,28 @@ function App() {
       return;
     }
 
-    const newCustomer = {
-      ...formData,
-      units: { ...units },
-      id: Date.now().toString(),
-      date: new Date().toLocaleDateString(language === 'en' ? 'en-IN' : 'hi-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      })
-    };
+    let updatedCustomers;
+    if (formData.id) {
+      const updatedCustomer = {
+        ...formData,
+        units: { ...units },
+        date: new Date().toLocaleDateString(language === 'en' ? 'en-IN' : 'hi-IN', {
+          day: 'numeric', month: 'short', year: 'numeric'
+        })
+      };
+      updatedCustomers = customers.map(c => c.id === formData.id ? updatedCustomer : c);
+    } else {
+      const newCustomer = {
+        ...formData,
+        units: { ...units },
+        id: Date.now().toString(),
+        date: new Date().toLocaleDateString(language === 'en' ? 'en-IN' : 'hi-IN', {
+          day: 'numeric', month: 'short', year: 'numeric'
+        })
+      };
+      updatedCustomers = [newCustomer, ...customers];
+    }
 
-    const updatedCustomers = [newCustomer, ...customers];
     setCustomers(updatedCustomers);
     localStorage.setItem('naap_customers', JSON.stringify(updatedCustomers));
     
@@ -212,9 +232,35 @@ function App() {
     setCurrentView('home');
   };
 
+  const handleAddClick = () => {
+    setFormData({
+      name: '', phone: '', kurtiLength: '', kurtiChest: '', kurtiWaist: '', kurtiShoulder: '', kurtiSideSlit: '',
+      kanchaliTukki: '', kanchaliSleeveLength: '', kanchaliSleeveRound: '', kanchaliKharaki: '', kanchaliBaadh: '',
+      lehengaLength: '', lehengaWaist: '', lehengaMagji: '', notes: ''
+    });
+    setUnits({});
+    setCurrentView('add');
+  };
+
+  const handleEditCustomer = () => {
+    setFormData({ ...selectedCustomer });
+    setUnits(selectedCustomer.units || {});
+    setCurrentView('add');
+  };
+
   const handleViewCustomer = (customer) => {
     setSelectedCustomer(customer);
     setCurrentView('view');
+  };
+
+  const handleDeleteCustomer = (id) => {
+    if (window.confirm(t.deleteConfirm)) {
+      const updatedCustomers = customers.filter(c => c.id !== id);
+      setCustomers(updatedCustomers);
+      localStorage.setItem('naap_customers', JSON.stringify(updatedCustomers));
+      setCurrentView('home');
+      setSelectedCustomer(null);
+    }
   };
 
   const renderInput = (label, name, placeholder = '') => {
@@ -318,7 +364,7 @@ function App() {
 
             <button 
               className="neumorphic-btn fab" 
-              onClick={() => setCurrentView('add')}
+              onClick={handleAddClick}
               aria-label="Add new customer"
             >
               <Plus size={28} />
@@ -412,6 +458,19 @@ function App() {
                 <div style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>{selectedCustomer.name}</div>
                 <div style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                   <Phone size={16} /> {selectedCustomer.phone || t.noPhone}
+                  {selectedCustomer.phone && (
+                    <div style={{ display: 'flex', gap: '10px', marginLeft: 'auto' }}>
+                      <a href={`tel:${selectedCustomer.phone}`} className="neumorphic-btn" style={{ padding: '6px', display: 'flex', alignItems: 'center', color: 'var(--accent-color)' }}>
+                        <PhoneCall size={16} />
+                      </a>
+                      <button className="neumorphic-btn" onClick={() => {
+                        navigator.clipboard.writeText(selectedCustomer.phone);
+                        alert(t.phoneCopied);
+                      }} style={{ padding: '6px', display: 'flex', alignItems: 'center', color: 'var(--accent-color)' }}>
+                        <Copy size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div style={{ color: 'var(--accent-color)', fontSize: '14px', fontWeight: '500' }}>{t.dateLabel} {selectedCustomer.date}</div>
               </div>
@@ -474,14 +533,30 @@ function App() {
               </div>
             )}
 
-            <div className="form-actions" style={{ marginTop: '30px', marginBottom: '40px' }}>
+            <div className="form-actions" style={{ marginTop: '30px', marginBottom: '40px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <button 
                 className="neumorphic-btn btn-primary" 
-                onClick={() => setCurrentView('home')}
-                style={{ width: '100%', padding: '18px' }}
+                onClick={handleEditCustomer}
+                style={{ width: '100%', padding: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               >
-                <ArrowLeft size={20} style={{ marginRight: '8px' }}/> {t.backToList}
+                <Edit2 size={20} style={{ marginRight: '8px' }}/> {t.editCustomer}
               </button>
+              <div style={{ display: 'flex', gap: '15px' }}>
+                <button 
+                  className="neumorphic-btn" 
+                  onClick={() => setCurrentView('home')}
+                  style={{ flex: 1, padding: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                >
+                  <ArrowLeft size={20} style={{ marginRight: '8px' }}/> {t.backToList}
+                </button>
+                <button 
+                  className="neumorphic-btn" 
+                  onClick={() => handleDeleteCustomer(selectedCustomer.id)}
+                  style={{ flex: 1, padding: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#e74c3c' }}
+                >
+                  <Trash2 size={20} style={{ marginRight: '8px' }}/> {t.deleteCustomer}
+                </button>
+              </div>
             </div>
           </div>
         )}
