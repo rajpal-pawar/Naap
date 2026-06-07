@@ -6,8 +6,8 @@
   "background_color": "#E0E5EC",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "/",
-  "start_url": "/",
+  "scope": "/Naap/",
+  "start_url": "/Naap/",
   "icons": [
     {
       "src": "icon.svg",
