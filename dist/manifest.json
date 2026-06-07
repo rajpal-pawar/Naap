@@ -1,0 +1,19 @@
+{
+  "name": "Naap - Tailor Ledger",
+  "short_name": "Naap",
+  "description": "Digital measurement ledger for tailoring Rajputi Poshaks.",
+  "theme_color": "#8A9A86",
+  "background_color": "#E0E5EC",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
